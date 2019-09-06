@@ -392,6 +392,40 @@ public class LNZTreeView: UIView {
         
         return realIndexPath
     }
+    
+    /**
+     This method will return the UITableViewCell associated with the indexPath.  The index path should be gathered
+     from getTableIndex as it will return a indexPath that is from the perspective of the table rather than from a
+     parent node.
+     
+     - parameter node: The node you want to find the table's indexPath to.
+     
+     - returns: UITableViewCell for the associated indexPath.
+     */
+    public func cellForRow(at indexPath: IndexPath) -> UITableViewCell? {
+        return tableView.cellForRow(at: indexPath)
+    }
+    
+    /**
+     This method will return the indexPath from the tables perspective rather than from the parent nodes
+     perspective. Note: this technique will only work if all nodes in a section have unique identifiers.
+     
+     - parameter node: The node you want to find the table's indexPath to.
+     - parameter section: The section where the node exists.
+     
+     - returns: IndexPath value from the perspective of the table.
+     */
+    public func getTableIndex(for node: TreeNodeProtocol, inSection section: Int) -> IndexPath? {
+        guard let visibleIndexes = tableView.indexPathsForVisibleRows?.filter({indexPath in return indexPath.section == section}) else { return nil }
+        for indexPath in visibleIndexes {
+            guard var nodes = nodesForSection[indexPath.section] else { return nil }
+            let nodeToCheck = nodes[indexPath.row]
+            if node.identifier == nodeToCheck.identifier {
+                return indexPath
+            }
+        }
+        return nil
+    }
 }
 
 //MARK: - UITableViewDataSource
